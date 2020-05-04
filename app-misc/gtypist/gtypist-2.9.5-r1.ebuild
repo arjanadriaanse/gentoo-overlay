@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -13,7 +13,6 @@ LICENSE="GPL-2 public-domain"
 SLOT="0"
 KEYWORDS="amd64 ppc x86 ~amd64-linux"
 IUSE="nls emacs xemacs"
-
 
 DEPEND="
 	>=sys-libs/ncurses-5.2:0=
@@ -31,10 +30,10 @@ src_unpack() {
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-2.8.3-xemacs-compat.patch
 
-        # from https://bugs.gentoo.org/698764
+	# solution from https://bugs.gentoo.org/698764#c0
 	epatch "${FILESDIR}"/${PN}-2.9.5-link-infow.patch
 
-        eaclocal && eautomake
+	eaclocal && eautomake
 }
 
 src_configure() {
@@ -56,7 +55,7 @@ src_configure() {
 DOCS=( AUTHORS ChangeLog NEWS README THANKS TODO )
 
 src_install() {
-        default
+	default
 
 	insinto /usr/share/gtypist
 	doins "${DISTDIR}"/colemak.typ
