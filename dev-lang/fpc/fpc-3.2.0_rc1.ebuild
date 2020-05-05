@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -16,9 +16,7 @@ SRC_URI="ftp://ftp.freepascal.org/pub/fpc/beta/3.2.0-rc1/source/fpc-${FPCV}.sour
 SLOT="0"
 LICENSE="GPL-2 LGPL-2.1-with-linking-exception"
 KEYWORDS="amd64 x86"
-IUSE="doc ide source"
-
-RDEPEND="ide? ( !dev-lang/fpc-ide )"
+IUSE="doc source"
 
 RESTRICT="strip" #269221
 
@@ -78,13 +76,13 @@ src_compile() {
 	# Using the bootstrap compiler.
 	set_pp bootstrap
 
-	emake -j1 PP="${pp}" compiler_cycle AS="$(tc-getAS)"
+	emake PP="${pp}" compiler_cycle AS="$(tc-getAS)"
 
 	# Save new compiler from cleaning...
 	cp "${S}"/compiler/ppc${FPC_ARCH} "${S}"/ppc${FPC_ARCH}.new || die
 
 	# ...rebuild with current version...
-	emake -j1 PP="${S}"/ppc${FPC_ARCH}.new AS="$(tc-getAS)" compiler_cycle
+	emake PP="${S}"/ppc${FPC_ARCH}.new AS="$(tc-getAS)" compiler_cycle
 
 	# ..and clean up afterwards
 	rm "${S}"/ppc${FPC_ARCH}.new || die
@@ -92,9 +90,9 @@ src_compile() {
 	# Using the new compiler.
 	set_pp new
 
-	emake -j1 PP="${pp}" AS="$(tc-getAS)" rtl_clean
+	emake PP="${pp}" AS="$(tc-getAS)" rtl_clean
 
-	emake -j1 PP="${pp}" AS="$(tc-getAS)" rtl packages_all utils
+	emake PP="${pp}" AS="$(tc-getAS)" rtl packages_all utils
 }
 
 src_install() {
@@ -110,18 +108,18 @@ src_install() {
 		INSTALL_MANDIR="${ED}"/usr/share/man \
 		INSTALL_SOURCEDIR="${ED}"/usr/lib/fpc/${FPCV}/source
 
-	emake -j1 "$@" compiler_install rtl_install packages_install utils_install
+	emake "$@" compiler_install rtl_install packages_install utils_install
 
-        mkdir "${ED}"/usr/lib64
-        mv "${ED}"/usr/lib/libpas2jslib.so "${ED}"/usr/lib64/libpas2jslib.so
+		mkdir "${ED}"/usr/lib64
+		mv "${ED}"/usr/lib/libpas2jslib.so "${ED}"/usr/lib64/libpas2jslib.so
 
 	dosym ../lib/fpc/${FPCV}/ppc${FPC_ARCH} /usr/bin/ppc${FPC_ARCH}
 
 	cd "${S}"/../install/doc || die
-	emake -j1 "$@" installdoc
+	emake "$@" installdoc
 
 	cd "${S}"/../install/man || die
-	emake -j1 "$@" installman
+	emake "$@" installman
 
 	if use doc ; then
 		cd "${S}"/../../doc || die
@@ -131,7 +129,7 @@ src_install() {
 	if use source ; then
 		cd "${S}" || die
 		shift
-		emake -j1 PP="${ED}"/usr/bin/ppc${FPC_ARCH} "$@" sourceinstall
+		emake PP="${ED}"/usr/bin/ppc${FPC_ARCH} "$@" sourceinstall
 		find "${ED}"/usr/lib/fpc/${FPCV}/source -name '*.o' -exec rm {} \;
 	fi
 
