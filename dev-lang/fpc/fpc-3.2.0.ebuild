@@ -1,17 +1,17 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
 inherit prefix toolchain-funcs
 
 HOMEPAGE="https://www.freepascal.org/"
 DESCRIPTION="Free Pascal Compiler"
-FPCV="3.2.0rc1"
-SRC_URI="ftp://ftp.freepascal.org/pub/fpc/beta/3.2.0-rc1/source/fpc-${FPCV}.source.tar.gz
-	ftp://ftp.freepascal.org/pub/fpc/beta/3.2.0-rc1/source/fpcbuild-${FPCV}.tar.gz
-	amd64? ( ftp://ftp.freepascal.org/pub/fpc/beta/3.2.0-rc1/x86_64-linux/fpc-${FPCV}.x86_64-linux.tar )
-	x86? ( ftp://ftp.freepascal.org/pub/fpc/beta/3.2.0-rc1/i386-linux/fpc-${FPCV}.i386-linux.tar )"
+FPCV="3.2.0"
+SRC_URI="ftp://ftp.freepascal.org/pub/fpc/dist/3.2.0/source/fpc-${FPCV}.source.tar.gz
+	ftp://ftp.freepascal.org/pub/fpc/beta/3.2.0-rc1/fpcbuild-${FPCV}.tar.gz
+	amd64? ( ftp://ftp.freepascal.org/pub/fpc/dist/3.2.0/x86_64-linux/fpc-${FPCV}-x86_64-linux.tar )
+	x86? ( ftp://ftp.freepascal.org/pub/fpc/dist/3.2.0/i386-linux/fpc-${FPCV}.i386-linux.tar )"
 
 SLOT="0"
 LICENSE="GPL-2 LGPL-2.1-with-linking-exception"
@@ -35,18 +35,21 @@ pkg_pretend() {
 
 src_unpack() {
 	case ${ARCH} in
-		amd64)	FPC_ARCH="x86_64"    PV_BIN="${FPCV}" ;;
-		x86)	FPC_ARCH="i386"      PV_BIN="${FPCV}" ;;
+		amd64)	FPC_ARCH="x86_64"    PV_BIN="${FPCV}-" ;;
+		x86)	FPC_ARCH="i386"      PV_BIN="${FPCV}." ;;
 		*)	die "This ebuild doesn't support ${ARCH}." ;;
 	esac
 
 	unpack ${A}
 
-	tar -xf ${PN}-${PV_BIN}.${FPC_ARCH}-linux/binary.${FPC_ARCH}-linux.tar || die "Unpacking binary.${FPC_ARCH}-linux.tar failed!"
+	tar -xf ${PN}-${PV_BIN}${FPC_ARCH}-linux/binary.${FPC_ARCH}-linux.tar || die "Unpacking binary.${FPC_ARCH}-linux.tar failed!"
 	tar -xzf base.${FPC_ARCH}-linux.tar.gz || die "Unpacking base.${FPC_ARCH}-linux.tar.gz failed!"
 }
 
 src_prepare() {
+	default	
+	PV_BIN="${FPCV}"
+
 	find "${WORKDIR}" -name Makefile -exec sed -i -e 's/ -Xs / /g' {} + || die
 
 	# let the pkg manager compress man files
@@ -122,7 +125,7 @@ src_install() {
 	emake "$@" installman
 
 	if use doc ; then
-		cd "${S}"/../../doc || die
+		cd "${S}"/../fpcdocs || die
 		dodoc -r *
 	fi
 
